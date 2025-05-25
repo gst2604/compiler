@@ -11,11 +11,35 @@ class Parser:
         self.ast = None
         self.errors = []
         self.current_line = 1
+        self.brace_stack = []  
 
     def update_line_number(self, p):
         """Update current line number based on token."""
         if p and hasattr(p, 'lineno'):
             self.current_line = p.lineno
+
+    def check_braces(self, data):
+        """Check if braces are properly matched in the code."""
+        self.brace_stack = []
+        lines = data.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            for char_pos, char in enumerate(line, 1):
+                if char in '{(':
+                    self.brace_stack.append((char, line_num, char_pos))
+                elif char in '})':
+                    if not self.brace_stack:
+                        self.errors.append(f"Error at line {line_num}, position {char_pos}: Unmatched closing brace '{char}'")
+                        return False
+                    opening_brace, open_line, open_pos = self.brace_stack.pop()
+                    if (opening_brace == '{' and char != '}') or (opening_brace == '(' and char != ')'):
+                        self.errors.append(f"Error at line {line_num}, position {char_pos}: Mismatched braces. Found '{char}' but expected matching '{opening_brace}' from line {open_line}, position {open_pos}")
+                        return False
+        
+        if self.brace_stack:
+            for brace, line_num, pos in self.brace_stack:
+                self.errors.append(f"Error: Unclosed '{brace}' from line {line_num}, position {pos}")
+            return False
+        return True
 
     # Program structure
     def p_program(self, p):
@@ -300,4 +324,9 @@ class Parser:
     def parse(self, data):
         self.errors = []  # Reset errors before parsing
         self.lexer.input(data)
+        
+        # Check braces before parsing
+        if not self.check_braces(data):
+            return None
+            
         return self.parser.parse(data) 
