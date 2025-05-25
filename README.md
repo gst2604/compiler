@@ -10,7 +10,6 @@ A comprehensive compiler implementation for a C-like programming language that d
 - [Components](#components)
 - [Examples](#examples)
 - [Error Handling](#error-handling)
-- [Contributing](#contributing)
 - [Team Members and Contributions](#team-members-and-contributions)
 
 ## Features
@@ -203,14 +202,6 @@ void main(void) {
 - Undefined references
 - Invalid scope access
 - Parameter mismatch
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
 
 ## Testing
 
